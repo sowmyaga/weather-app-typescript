@@ -8,13 +8,12 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import "./Forcaste.css";
 
-
 const Forcaste = ():JSX.Element => {
     const [weatherData, setweatherData] = useState<any>([]);//to set week weather data
     const [currentweather, setcurrentweather] = useState<any>([])//to current day weather data
-    const [City, setCity] = useState("bangalore");//default taking current location to display weather data.
-    const [unit, setUnit] = useState("");//to switch between different units
-    const [isImperialUnitSelected, setIsImperialUnitSelected] = useState(false);//boolen to switch different units.
+    const [City, setCity] = useState<string>("bangalore");//default taking current location to display weather data.
+    const [unit, setUnit] = useState<string>("");//to switch between different units
+    const [isImperialUnitSelected, setIsImperialUnitSelected] = useState<boolean>(false);//boolen to switch different units.
 
 
     useEffect(() => {
@@ -47,7 +46,7 @@ const Forcaste = ():JSX.Element => {
 
     //onclick function to get searched location data
     const handleSearchByLocation = async () => {
-        const data = {
+        const data= {
             days: 7,
             location: City,
         };
@@ -104,20 +103,20 @@ const Forcaste = ():JSX.Element => {
                         {Object.keys(currentweather).length ?
                             <Row className="justify-content-md-center">
                                 <Form>
-                                    <Row className="align-items-center">
-                                        <Col xs="auto">
+                                    <Row className="justify-content-md-center">
+                                        <Col xs lg="5">
                                             <Form.Control placeholder="Location" value={City} onChange={handleCityInput} />
                                         </Col>
-                                        <Col xs="auto">
+                                        <Col xs lg="1">
                                             <Button onClick={handleSearchByLocation}>
                                                 Search
                                             </Button>
                                         </Col>
 
-                                        <Col>
-                                            <Form.Select size="sm" style={{ "width": "30%" }} aria-label="Default select example" onChange={handleUnits} value={unit}>
-                                                <option>select units</option>
-                                                <option value="metric">metric</option>
+                                        <Col xs lg="2">
+                                            
+                                            <Form.Select  style={{ "width": "100%" }} aria-label="Default select example" onChange={handleUnits} value={unit}>
+                                                <option value="metric" defaultChecked>metric</option>
                                                 <option value="imperial">imperial</option>
                                             </Form.Select>
                                         </Col>
@@ -140,7 +139,7 @@ const Forcaste = ():JSX.Element => {
                                 </Col>
                             </Row> : "Loading...."}
                     </Container>
-                    <Row>
+                    <Row className="justify-content-md-center">
                         <Col sm={8}>
                             <div className="weather-details">
                                 {weatherUi}
