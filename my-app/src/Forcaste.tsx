@@ -102,9 +102,9 @@ const Forcaste: React.FC = () => {
     }) : ""
 
     //formatting date
-    var dob = new Date(Object.keys(currentweather).length ? currentweather.forecast[0].date : "");
-    var dobArr = dob.toDateString().split(' ');
-    var dobFormat = dobArr[0] + ',' + dobArr[1] + ' ' + dobArr[2]
+    let dob = new Date(Object.keys(currentweather).length ? currentweather.forecast[0].date : "");
+    let dobArr = dob.toDateString().split(' ');
+    const  dobFormat = dobArr[0] + ',' + dobArr[1] + ' ' + dobArr[2]
     return (
         <>
             <Card>
