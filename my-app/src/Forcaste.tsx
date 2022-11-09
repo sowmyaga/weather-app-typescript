@@ -108,7 +108,7 @@ const Forcaste: React.FC = () => {
     return (
         <>
             <Card>
-                <Card.Header as="h5">Weather Application</Card.Header>
+                <Card.Header as="h5" style={{"textAlign":"center"}}>Weather Application</Card.Header>
                 <Card.Body className="card-body">
                     <Container>
                         {Object.keys(currentweather).length ?
