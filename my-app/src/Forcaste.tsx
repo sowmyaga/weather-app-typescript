@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import axios from "axios";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -8,9 +8,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import "./Forcaste.css";
 
-const Forcaste = ():JSX.Element => {
+const Forcaste: React.FC = () => {
     const [weatherData, setweatherData] = useState<any>([]);//to set week weather data
-    const [currentweather, setcurrentweather] = useState<any>([])//to current day weather data
+    const [currentweather, setcurrentweather] = useState<any>([]);//to current day weather data
     const [City, setCity] = useState<string>("bangalore");//default taking current location to display weather data.
     const [unit, setUnit] = useState<string>("");//to switch between different units
     const [isImperialUnitSelected, setIsImperialUnitSelected] = useState<boolean>(false);//boolen to switch different units.
@@ -23,20 +23,48 @@ const Forcaste = ():JSX.Element => {
         });
     }, [])
 
+    const getlocationData = async () => {
+        try {
+            const data = {
+                days: 7,
+                location: City,
+            };
+            const headers = {
+                'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`,
+                'Content-Type': 'application/json'
+            };
+            await axios.post(`${process.env.REACT_APP_API}`, data, { headers })
+                .then((response) => {
+                    if (!response) {
+                        return false;
+                    }
+                    else {
+                        setcurrentweather(response ? response.data : null)
+                        setweatherData(response ? response.data : null)
+                    }
+                });
+        }
+        catch (error) {
+            console.log(error)
+        }
+
+    }
     //to get onload data to display weather data
     useEffect(() => {
-        handleSearchByLocation();
+        getlocationData();
     }, [])
 
     // onchange function to get input location value
-    const handleCityInput = (e: any) => {
+    const handleCityInput = (e: ChangeEvent<HTMLInputElement>) => {
         setCity(e.target.value);
     }
 
     //switch units between imperial/metric units
-    const handleUnits = (e: any) => {
-        setUnit(e.target.value);
-        if (e.target.value == "imperial") {
+    const handleUnits = (e: React.FormEvent) => {
+        let target = e.target as HTMLSelectElement;
+        const intval: string = target.value;
+        setUnit(intval);
+        if (intval === "imperial") {
             setIsImperialUnitSelected(true);
         }
         else {
@@ -45,37 +73,20 @@ const Forcaste = ():JSX.Element => {
     }
 
     //onclick function to get searched location data
-    const handleSearchByLocation = async () => {
-        const data= {
-            days: 7,
-            location: City,
-        };
-        const headers = {
-            'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`,
-            'Content-Type': 'application/json'
-        };
-        await axios.post(`${process.env.REACT_APP_API}`, data, { headers })
-            .then((response) => {
-                if (!response) {
-                    return false;
-                }
-                else {
-                    setcurrentweather(response ? response.data : null)
-                    setweatherData(response ? response.data : null)
-                }
-            });
+    const handleSearchByLocation = async (e: FormEvent) => {
+        e.preventDefault();
+        getlocationData()
     }
     //to get Ui week weather data
-    const weatherUi: any = Object.keys(currentweather).length ? weatherData.forecast.map((item: any) => {
-        var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        var d = new Date(item.date);
-        var dayName = days[d.getDay()];
-
+    const weatherUi: JSX.Element = Object.keys(currentweather).length ? weatherData.forecast.map((item: any) => {
+        let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let d = new Date(item.date);
+        const dayName = days[d.getDay()];
         return (
             <>
                 <div>
                     <div className="weather-day">{dayName}</div>
-                    <img src={item.icon_url} />
+                    <img src={item.icon_url} alt="img" />
                     <div>
                         <span>
                             {isImperialUnitSelected ? <b>{item.max_temp_f}&deg;F</b> : <b>{item.max_temp_c}&deg;C</b>}
@@ -108,14 +119,12 @@ const Forcaste = ():JSX.Element => {
                                             <Form.Control placeholder="Location" value={City} onChange={handleCityInput} />
                                         </Col>
                                         <Col xs lg="1">
-                                            <Button onClick={handleSearchByLocation}>
+                                            <Button onClick={(e) => { handleSearchByLocation(e) }}>
                                                 Search
                                             </Button>
                                         </Col>
-
                                         <Col xs lg="2">
-                                            
-                                            <Form.Select  style={{ "width": "100%" }} aria-label="Default select example" onChange={handleUnits} value={unit}>
+                                            <Form.Select style={{ "width": "100%" }} aria-label="Default select example" onChange={handleUnits} value={unit}>
                                                 <option value="metric" defaultChecked>metric</option>
                                                 <option value="imperial">imperial</option>
                                             </Form.Select>
@@ -126,7 +135,7 @@ const Forcaste = ():JSX.Element => {
                                     <div style={{ "fontSize": "22px" }}>
                                         <b>{Object.keys(currentweather).length ? currentweather.location : ""}</b></div>
                                     <div>{dobFormat} &nbsp;Overcast</div>
-                                    <img src={Object.keys(currentweather).length ? currentweather.forecast[0].icon_url : ""} style={{ "width": "109px" }} />&nbsp;
+                                    <img src={Object.keys(currentweather).length ? currentweather.forecast[0].icon_url : ""} style={{ "width": "109px" }} alt="img" />&nbsp;
                                     {isImperialUnitSelected ? <span style={{ "marginTop": "44px" }}><b>{Object.keys(currentweather).length ? currentweather.forecast[0].max_temp_f : ""}&deg;F</b></span> : <span style={{ "marginTop": "44px" }}><b>{Object.keys(currentweather).length ? currentweather.forecast[0].max_temp_c : ""}&deg;C</b></span>}
                                 </Col>
                                 <Col xs lg="4">

@@ -1,16 +1,13 @@
-import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import Forcast from "./Forcaste";
-import axios from "axios";
+ import { render, fireEvent, waitFor,cleanup } from '@testing-library/react';
+ import Forcast from "./Forcaste";
+ import axios from "axios";
 
- jest.mock('axios'); // This overwrites axios methods with jest Mock
- const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-describe('Test Apis', () => {
-    const renderComponent=() => (render(<Forcast />));
-    test('getweatherData', async () => {
+afterEach(cleanup);
+describe('Test Forcaste Componet', () => {
+    beforeEach(async () => {
+        const renderComponent=() => (render(<Forcast />));
         const { getByText } = renderComponent();
-        mockedAxios.get.mockResolvedValue({
+        jest.spyOn(axios, 'post').mockResolvedValue({
             data:{
                 country:"India",
                 forcaste:[{
@@ -38,14 +35,26 @@ describe('Test Apis', () => {
                 timeZone:"Asia/Kolkata"
 
             }
-          });
+        });
         fireEvent.click(getByText('Search'));
         await waitFor(() => {
             const weatherList = ('listitem');
             expect(weatherList).toHaveLength(7);
             expect(weatherList[0]).toHaveTextContent('Bangalore');
           });
-    })
-    
+    });      
+      
+    it("should be able to type name input field", () => {
+        const { getByTestId } = render (<Forcast />);
+        fireEvent.change(getByTestId("unit"), { target: { value: "metrics" } });
+        expect(getByTestId("unit").nodeValue).toBe("metrics");
+      })
+      
+      it("Inputs should have the correct value", () => {
+        const { getByLabelText } = render(<Forcast />)
+        const input = getByLabelText(/Location/i)
+        expect(input.nodeValue).toBe("");
+        fireEvent.change(input, { target: { value: "Bangalore" } })
+        expect(input.nodeValue).toBe("Bangalore");
+      })
 });
-

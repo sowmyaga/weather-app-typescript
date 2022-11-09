@@ -1,9 +1,18 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import App from './App';
+import {
+    componentRenderByMemoryRouter,
+    toBeExpectByTestId,
+    toBeExpectByText,
+} from './util';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/Weather Application/i);
-  expect(linkElement).toBeInTheDocument();
-});
+describe('Test App Router', () => {
+    test('should render app componet', () => {
+        componentRenderByMemoryRouter('/', <App />);
+        toBeExpectByTestId('app-component-test-id');
+    });
+
+    test('should Render forcaste component with path "/"', () => {
+        componentRenderByMemoryRouter('/', <App />);
+        toBeExpectByText('Weather Application');
+    });
+  })
